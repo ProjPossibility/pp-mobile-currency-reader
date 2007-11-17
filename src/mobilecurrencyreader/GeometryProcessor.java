@@ -15,11 +15,9 @@ import java.awt.Point;
  * @author binarygame
  */
 public interface GeometryProcessor {
-    public  byte [] translateImage(byte orig[], int height,int width, int tx, int ty);
-    public byte [] rotateImage(byte orig[], int height,int width, float angleOfRotation);
-    public byte []  scaleImage(byte orig[], int height,int width, float sx, float sy);
-    public byte []  extractImage(byte orig[], int height, int width,Point  verticeArray[] );   
-    public Point[] detectVertices(byte img[], int height, int width);
-    
-     
+    public  byte [] translateImage(byte orig[], int width,int height, int tx, int ty);
+    public byte [] rotateImage(byte orig[], int width,int height, float angleOfRotation);
+    public byte []  scaleImage(byte orig[], int width,int height, float sx, float sy);
+    public byte []  extractImage(byte orig[], int width, int height,Point  verticeArray[] );   
+    public Point[] detectVertices(byte img[], int width, int height);
 }
