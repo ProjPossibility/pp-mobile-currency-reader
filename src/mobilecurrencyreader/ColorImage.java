@@ -8,6 +8,7 @@
  */
 
 package mobilecurrencyreader;
+using java.math.*;
 
 /**
  *
@@ -45,9 +46,23 @@ public class ColorImage implements ColorProcessor {
         return original;
         
     }
-    public double subtractImage(byte a[], byte b[], int height, int width)
+    public double subtractImage(byte orig[], byte compare[])
     {
-        return 0;
+        
+        int sumOfSquares=0,i=0;
+        double rmsVal;
+        if (orig.length!=compare.length)
+        {
+            return -1;
+        }
+        for(i=0;i<orig.length;i++)
+        {
+            sumOfSquares+= ((int)orig[i]-(int)compare[i])*((int)orig[i]-(int)compare[i]);
+        }
+        rmsVal=sumOfSquares/orig.length;
+        rmsVal=Math.sqrt(rmsVal);
+        return rmsVal;
+       
     }
   
     
