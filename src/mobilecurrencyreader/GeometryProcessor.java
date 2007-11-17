@@ -8,18 +8,16 @@
  */
 
 package mobilecurrencyreader;
+import java.awt.Point;
 
 /**
  *
  * @author binarygame
  */
 public interface GeometryProcessor {
-    public  byte [] translateImage(byte[], int height,int width, int tx, int ty);
-     public byte [] rotateImage(byte[], int height,int width, int tx, int ty);
-    public byte [] scaleImage(byte[], int height,int width, int tx, int ty);
+    public  byte [] translateImage(byte orig[], int height,int width, int tx, int ty);
+    public byte [] rotateImage(byte orig[], int height,int width, float angleOfRotation);
+    public byte []  scaleImage(byte orig[], int height,int width, float sx, float sy);
+    public byte []  extractImage(byte orig[], int height, int width,Point  verticeArray[] );   
      
-    
-    
-    
-    
 }
