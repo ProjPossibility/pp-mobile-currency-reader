@@ -16,6 +16,6 @@ package mobilecurrencyreader;
 public interface ColorProcessor {
     public byte[] convertToGrayscale(byte original[], int height, int width);
     public byte[] expandDynamicRange(byte original[], int height, int width);
-    public byte[] quantize(byte original[], int height, int width, int N);
+    public byte[] quantize(byte original[],  int N);
     public double subtractImage(byte a[], byte b[], int height, int width);
 }
