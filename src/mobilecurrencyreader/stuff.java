@@ -12,7 +12,9 @@ package ss12;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -47,8 +49,13 @@ public class Main {
     }
     
     public void rotate(int degrees,int anchorX,int anchorY){
+        
+        BufferedImage sourceBi;/* here we have to convert*/
+                                
         AffineTransform affineTransform = new AffineTransform();
         affineTransform.rotate(degrees * Math.PI / 180.0,anchorX,anchorY); 
+         BufferedImageOp bio = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+           BufferedImage destinationBI = bio.filter(sourceBi, null);
         
     }
     
@@ -69,6 +76,17 @@ public class Main {
        g.drawRenderedImage(img, null);
        g.dispose();
        return grayImage;
+    }
+    
+    
+    public  byte [] translateImage(byte orig[], int width,int height, int tx, int ty){
+     BufferedImage sourceBi; /* have to initialise here */
+     
+     Graphics2D g = sourceBi.createGraphics();
+     g.translate(tx,ty);
+     
+     
+     
     }
     
     /**
