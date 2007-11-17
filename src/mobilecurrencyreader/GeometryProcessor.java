@@ -17,6 +17,7 @@ import java.awt.Point;
 public interface GeometryProcessor {
     public  byte [] translateImage(byte orig[], int width,int height, int tx, int ty);
     public byte [] rotateImage(byte orig[], int width,int height, float angleOfRotation);
+    public byte [] cropImage(byte orig[], int origWidth,int origHeight, int tx, int ty, int newWidth, int newHeight);
     public byte []  scaleImage(byte orig[], int width,int height, float sx, float sy);
     public byte []  extractImage(byte orig[], int width, int height,Point  verticeArray[] );   
     public Point[] detectVertices(byte img[], int width, int height);

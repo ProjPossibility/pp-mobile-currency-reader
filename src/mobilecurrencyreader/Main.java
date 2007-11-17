@@ -1,5 +1,6 @@
 package mobilecurrencyreader;
 
+import java.awt.Graphics2D;
 import java.io.File;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -21,9 +22,17 @@ public class Main {
     public static void main(String[] args) {
         TestWindow window = new TestWindow();
         File imageFile = new File("testImage.jpg");
+        GeometryProcessorJ2SE geom = new GeometryProcessorJ2SE();
+        
         try {
-            BufferedImage image = ImageIO.read(imageFile);
-            window.setLeftImage(image);
+            BufferedImage orig = ImageIO.read(imageFile);
+            BufferedImage image = Main.convertToGraySclae(orig);
+            byte[] bytes = geom.bufferedToByte(image);
+            BufferedImage converted = geom.byteToBuffered(bytes, image.getWidth(), image.getHeight());
+            window.setLeftImage(orig);
+            if (converted != null)
+                window.setRightImage(converted);
+            else System.out.println("Converted image is null!");
             System.out.println("Loaded Image: " + imageFile.getAbsolutePath());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -31,4 +40,14 @@ public class Main {
         window.setVisible(true);
     }
     
+    public static BufferedImage convertToGraySclae(BufferedImage img){
+        int width=img.getWidth();
+        int height = img.getHeight();
+        int type = java.awt.image.BufferedImage.TYPE_BYTE_GRAY;
+        BufferedImage grayImage = new java.awt.image.BufferedImage(width, height, type);
+        Graphics2D g = grayImage.createGraphics();
+        g.drawRenderedImage(img, null);
+        g.dispose();
+        return grayImage;
+    }
 }

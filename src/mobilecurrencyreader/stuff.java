@@ -27,11 +27,11 @@ import javax.imageio.metadata.IIOMetadata;
  *
  * @author OM
  */
-public class Main {
+public class stuff {
     
     static BufferedImage bufferedImage;
     /** Creates a new instance of Main */
-    public Main() {
+    public stuff() {
     }
     
     /**
