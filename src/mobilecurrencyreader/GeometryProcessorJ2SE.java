@@ -63,21 +63,6 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     }
     
     public BufferedImage byteToBuffered(byte[] img, int width, int height) {
-//        BufferedImage reader = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-//        int[] array = new int[1];
-//        array[1] = 0xffffffff;
-//        SinglePixelPackedSampleModel model = new SinglePixelPackedSampleModel(DataBuffer.TYPE_BYTE, width, height, array);
-//        Raster raster = new Raster(model, new DataBufferByte(byte[] dataArray, int size, int offset), new Point(0,0));
-//        reader.setData(raster);
-//        
-//        ByteArrayInputStream stream = new ByteArrayInputStream(img);
-//        try {
-//            BufferedImage buf = ImageIO.read(stream);
-//            return buf;
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//            return null;
-//        }
         DataBuffer buffer = new DataBufferByte(img, width*height);
         
         int pixelStride = 1; //assuming r, g, b, skip, r, g, b, skip...
