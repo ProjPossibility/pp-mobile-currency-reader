@@ -19,5 +19,7 @@ public interface GeometryProcessor {
     public byte [] rotateImage(byte orig[], int height,int width, float angleOfRotation);
     public byte []  scaleImage(byte orig[], int height,int width, float sx, float sy);
     public byte []  extractImage(byte orig[], int height, int width,Point  verticeArray[] );   
+    public Point[] detectVertices(byte img[], int height, int width);
+    
      
 }
