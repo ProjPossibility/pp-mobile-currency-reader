@@ -94,6 +94,50 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         }
         return out;
     }
+    
+    private int[] getMinMaxFeature(ByteBufferImage img, int row) {
+        int min_col = -1, max_col = -1;
+        for (int i = 0; i < img.width; i++) {
+            if (isFeature(img, i, row)) {
+                if (min_col < 0)
+                    min_col = i;
+                max_col = i;
+            }
+        }
+        int ret[] = new int[2];
+        ret[0] = min_col;
+        ret[1] = max_col;
+        return ret;
+    }
+    
+    private Point findVerticeRecurse(ByteBufferImage img, int min_row, int max_row, int last_row) {
+        if (min_row >= max_row) {
+            int col_range[] = getMinMaxFeature(img, max_row);
+            if (col_range[0] < 0) {
+                System.out.println("no vertex found");
+                return null;
+            } else {
+                System.out.println("min_row=" + min_row + " max_row=" + max_row + " min_col=" + col_range[0] + " max_col=" + col_range[1]);
+                return new Point((col_range[0]+col_range[1])/2, (min_row+max_row)/2);
+            }
+        } else {
+            int middle = (max_row+min_row)/2;
+            int col_range[] = getMinMaxFeature(img, middle);
+            if (col_range[0] < 0) {
+                // no features on middle
+                if (last_row < middle)
+                    return findVerticeRecurse(img, min_row, middle, last_row);
+                else
+                    return findVerticeRecurse(img, min_row, middle, last_row);
+            } else {
+                // feature found
+                if (last_row < middle)
+                    return findVerticeRecurse(img, middle, max_row, middle);
+                else
+                    return findVerticeRecurse(img, middle, max_row, middle);
+            }
+        }
+    }
 
     public Point[] detectVertices(ByteBufferImage image) {
         

@@ -104,23 +104,29 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         return hist;
     }
 
-    private static double calculateStdDev(ByteBufferImage image, double mean) {
+    private static double calculateStdDev(ByteBufferImage image, int x0, int y0, int x1, int y1, double mean) {
         double sum = 0.0;
-        for (int i = 0; i < image.bytes.length; i++)
-            sum += Math.pow(image.getPixelDouble(i) - mean, 2);
-        return Math.sqrt(sum/image.bytes.length);
+        for (int i = y0; i < y1; i++)
+            for (int j = x0; j < x1; j++)
+                sum += Math.pow(image.getPixelDouble(j,i) - mean, 2);
+        return Math.sqrt(sum/((x1-x0)*(y1-y0)));
     }
     
-    private static double calculateMean(ByteBufferImage image) {
+    private static double calculateMean(ByteBufferImage image, int x0, int y0, int x1, int y1) {
         double sum = 0.0;
-        for (int i = 0; i < image.bytes.length; i++)
-            sum += image.getPixelDouble(i);
-        return sum / image.bytes.length;
+        for (int i = y0; i < y1; i++)
+            for (int j = x0; j < x1; j++)
+                sum += image.getPixelDouble(j,i);
+        return sum / ((x1-x0)*(y1-y0));
     }
     
     public ByteBufferImage expandDynamicRange(ByteBufferImage original) {
-        double mean = calculateMean(original);
-        double sd = calculateStdDev(original, mean);
+        return expandDynamicRange(original, 0, 0, original.width-1, original.height-1);
+    }
+    
+    public ByteBufferImage expandDynamicRange(ByteBufferImage original, int x0, int y0, int x1, int y1) {
+        double mean = calculateMean(original, x0, y0, x1, y1);
+        double sd = calculateStdDev(original, x0, y0, x1, y1, mean);
         
         System.out.println("mean: " + mean + " sd: " + sd);
         

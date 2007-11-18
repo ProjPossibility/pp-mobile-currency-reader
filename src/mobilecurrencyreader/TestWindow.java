@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Dimension;
+import java.awt.image.DataBuffer;
 
 /**
  *
@@ -17,7 +18,9 @@ public class TestWindow extends JFrame implements ActionListener {
     JPanel leftPanel = new JPanel();
     JPanel rightPanel = new JPanel();
     JButton button = new JButton("Do Something!");
+    BufferedImage leftImage;
     
+    boolean tmp = false;
     
     /** Creates a new instance of TestWindow */
     public TestWindow() {
@@ -38,6 +41,7 @@ public class TestWindow extends JFrame implements ActionListener {
     
     public void setLeftImage(BufferedImage image) {
         setImagePanel(image, leftPanel);
+        leftImage = image;
     }
     
     public void setRightImage(BufferedImage image) {
@@ -54,7 +58,36 @@ public class TestWindow extends JFrame implements ActionListener {
     }
     
     public void actionPerformed(ActionEvent e) {
-        //do test code here!
+        BufferedImage gray = convertToGrayScale(leftImage);
+        
+        GeometryProcessorJ2SE gp = new GeometryProcessorJ2SE();
+        ColorProcessorJ2SE cp = new ColorProcessorJ2SE();
+        
+        ByteBufferImage bbi = gp.bufferedToByte(gray);
+        
+        tmp = !tmp;
+        if (tmp) {
+            bbi = cp.expandDynamicRange(bbi);
+        }
+        
+        BufferedImage new_buf = gp.byteToBuffered(bbi);
+        
+        setRightImage(new_buf);
+        
+        rightPanel.invalidate();
+    }
+    
+
+    
+    public BufferedImage convertToGrayScale(BufferedImage img){
+       int width=img.getWidth();
+       int height = img.getHeight();
+       int type = java.awt.image.BufferedImage.TYPE_BYTE_GRAY;
+       BufferedImage grayImage = new java.awt.image.BufferedImage(width, height, type);
+       Graphics2D g = grayImage.createGraphics();
+       g.drawRenderedImage(img, null);
+       g.dispose();
+       return grayImage;
     }
     
 }
