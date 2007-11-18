@@ -25,33 +25,20 @@ public class ColorProcessorJ2SE implements ColorProcessor {
      
     public ByteBufferImage quantize(ByteBufferImage original, int Colors)
     {
-        int i,c;
-        
-  
-        
+        int i, c;
         int N=256/Colors;
         
-        
-        for(i=0;i<original.bytes.length;i++)
-        {
-            
+        for(i=0;i<original.bytes.length;i++) {
             c=(int)(original.getPixelInt(i));
             
             if(c>(N*(Colors-1))&&c<256)
                 c=255;
             else
-            {
-               
-                     c=(c/N)*N;
-                    
-            }
-                
-                   
-               //copy value back to original array
-               original.bytes[i]=(byte)c;
+                c=(c/N)*N;
+            
+           //copy value back to original array
+           original.bytes[i]=(byte)c;
         }
-        
-       
         
         return original;
     }
@@ -125,6 +112,10 @@ public class ColorProcessorJ2SE implements ColorProcessor {
     }
     
     public ByteBufferImage expandDynamicRange(ByteBufferImage original, int x0, int y0, int x1, int y1) {
+        return expandDynamicRange(original, x0, y0, x1, y1, 0, 255);
+    }
+    
+    public ByteBufferImage expandDynamicRange(ByteBufferImage original, int x0, int y0, int x1, int y1, int m, int n) {
         double mean = calculateMean(original, x0, y0, x1, y1);
         double sd = calculateStdDev(original, x0, y0, x1, y1, mean);
         
@@ -132,15 +123,15 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         
         double min = mean - sd;
         
+        double scale_factor = (n+1-m) / (2 * sd);
         for (int i = 0; i < original.bytes.length; i++) {
-            long scaled = Math.round((original.getPixelDouble(i) - min) * (256 / (2 * sd)));
-            if (scaled < 0)
+            long scaled = Math.round((original.getPixelDouble(i) - min) * scale_factor) + m;
+            if (scaled < m)
                 original.bytes[i] = 0;
-            else if (scaled > 255)
+            else if (scaled > n)
                 original.bytes[i] = (byte)255;
             else
                 original.bytes[i] = (byte)scaled;
-            //System.out.println("scaled: " + scaled + " new: " + original[i]);
         }
         
         return original;
