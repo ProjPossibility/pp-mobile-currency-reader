@@ -42,4 +42,10 @@ public class ByteBufferImage {
     public double getPixelDouble(int i) {
         return (double)(bytes[i]&0xff);
     }
+    public void drawBox(int x, int y, int size, byte color) {
+        for (int i = y-size/2; i < y+size/2; i++)
+            for (int j = x-size/2; j < x+size/2; j++)
+                if (i >= 0 && i < height && j >= 0 && j < width)
+                    setPixel(i,j,color);
+    }
 }

@@ -22,6 +22,7 @@ import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 /**
@@ -95,13 +96,15 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return out;
     }
     
+    
+    
     private int[] getMinMaxFeature(ByteBufferImage img, int row) {
         int min_col = -1, max_col = -1;
-        for (int i = 0; i < img.width; i++) {
-            if (isFeature(img, i, row)) {
+        for (int j = 0; j < img.width; j++) {
+            if (isFeature(img, row, j)) {
                 if (min_col < 0)
-                    min_col = i;
-                max_col = i;
+                    min_col = j;
+                max_col = j;
             }
         }
         int ret[] = new int[2];
@@ -110,38 +113,72 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return ret;
     }
     
-    private Point findVerticeRecurse(ByteBufferImage img, int min_row, int max_row, int last_row) {
-        if (min_row >= max_row) {
+    private ArrayList<Point> findVerticeRecurse(ByteBufferImage img, int min_row, int max_row, int last_row) {
+        System.out.println("min_row=" + min_row + " max_row=" + max_row + " last_row=" + last_row);
+        if (Math.abs(max_row-min_row) <= 1) {
             int col_range[] = getMinMaxFeature(img, max_row);
+            ArrayList<Point> list = new ArrayList<Point>();
             if (col_range[0] < 0) {
                 System.out.println("no vertex found");
-                return null;
             } else {
                 System.out.println("min_row=" + min_row + " max_row=" + max_row + " min_col=" + col_range[0] + " max_col=" + col_range[1]);
-                return new Point((col_range[0]+col_range[1])/2, (min_row+max_row)/2);
+                list.add(new Point((col_range[0]+col_range[1])/2, (min_row+max_row)/2));
             }
+            return list;
         } else {
             int middle = (max_row+min_row)/2;
             int col_range[] = getMinMaxFeature(img, middle);
+            
+            ArrayList newlist;
             if (col_range[0] < 0) {
                 // no features on middle
-                if (last_row < middle)
-                    return findVerticeRecurse(img, min_row, middle, last_row);
+                if (middle < last_row)
+                    newlist = findVerticeRecurse(img, middle, max_row, last_row);
                 else
-                    return findVerticeRecurse(img, min_row, middle, last_row);
+                    newlist = findVerticeRecurse(img, min_row, middle, last_row);
             } else {
                 // feature found
-                if (last_row < middle)
-                    return findVerticeRecurse(img, middle, max_row, middle);
+                if (middle < last_row)
+                    newlist = findVerticeRecurse(img, min_row, middle, middle);
                 else
-                    return findVerticeRecurse(img, middle, max_row, middle);
+                    newlist = findVerticeRecurse(img, middle, max_row, middle);
+                newlist.add(new Point(col_range[0], middle));
+                newlist.add(new Point(col_range[1], middle));
             }
+            return newlist;
         }
     }
-
-    public Point[] detectVertices(ByteBufferImage image) {
+    
+    private ArrayList<Point> getVertices(ByteBufferImage img) {
+        ArrayList<Point> points = new ArrayList<Point>();
+        points.addAll(findVerticeRecurse(img, 0,            img.height/2,   img.height/2));
+        points.addAll(findVerticeRecurse(img, img.height/2, img.height,     img.height/2));
         
-        return null;
+        return points;
+    }
+    
+    private ArrayList<Point> swapPoints(ArrayList<Point> points) {
+        for (int i = 0; i < points.size(); i++) {
+            Point p = points.get(i);
+            int tmp = p.x;
+            p.x = p.y;
+            p.y = tmp;
+        }
+        return points;
+    }
+    
+    public ByteBufferImage detectVertices(ByteBufferImage img) {
+        ArrayList<Point> points = new ArrayList<Point>();
+        
+        points.addAll(getVertices(img));
+        points.addAll(swapPoints(getVertices(swapIJ(img))));
+        
+        for (int i = 0; i < points.size(); i++) {
+            Point p = points.get(i);
+            img.drawBox(p.x, p.y, 5, (byte)0xFF); 
+        }
+        
+        return img;
     }
     
     // convert a greyscale byte array to a buffered image

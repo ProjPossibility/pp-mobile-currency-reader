@@ -20,5 +20,5 @@ public interface GeometryProcessor {
     public ByteBufferImage cropImage(ByteBufferImage orig, int tx, int ty, int newWidth, int newHeight);
     public ByteBufferImage scaleImage(ByteBufferImage orig, float sx, float sy);
     public ByteBufferImage extractImage(ByteBufferImage orig, Point verticeArray[]);   
-    public Point[] detectVertices(ByteBufferImage img);
+    public ByteBufferImage detectVertices(ByteBufferImage img);
 }
