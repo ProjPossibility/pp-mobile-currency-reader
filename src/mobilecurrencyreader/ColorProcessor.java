@@ -14,8 +14,8 @@ package mobilecurrencyreader;
  * @author binarygame
  */
 public interface ColorProcessor {
-    public byte[] convertToGrayscale(byte original[], int height, int width);
-    public byte[] expandDynamicRange(byte original[], int height, int width);
-    public byte[] quantize(byte original[],  int N);
-    public double subtractImage(byte original[], byte compare[]);
+    public ByteBufferImage convertToGrayscale(byte original[][], int height, int width);
+    public ByteBufferImage expandDynamicRange(ByteBufferImage original);
+    public ByteBufferImage quantize(ByteBufferImage original,  int N);
+    public double subtractImage(ByteBufferImage a, ByteBufferImage b);
 }
