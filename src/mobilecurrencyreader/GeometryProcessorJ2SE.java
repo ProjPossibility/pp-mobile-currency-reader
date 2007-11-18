@@ -405,12 +405,18 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,d
     }
     
     // converts a buffered image to a byte array
-    public ByteBufferImage bufferedToByte(BufferedImage img) {
-        DataBuffer buf = img.getData().getDataBuffer();
-        ByteBufferImage newImg = new ByteBufferImage(img.getWidth(), img.getHeight());
-        for (int i = 0; i < buf.getSize(); i++)
-            newImg.bytes[i] = (byte)buf.getElem(i);
-        return newImg;
+    public ByteBufferImage bufferedToByte(BufferedImage orig) {
+     byte[] newBytes = new byte[orig.getWidth()*orig.getHeight()];
+       for(int i=0;i<orig.getHeight();i++)
+            for(int j=0;j<orig.getWidth();j++)
+               {
+                   int k1=orig.getRGB(j,i);
+                   double bb=(double)(0x00ff & k1);
+                   double gg=(double)((0x00ff)&(k1 >> 8));
+                   double rr=(double)((0x00ff)&((k1 >> 16)));
+                   newBytes[i*(orig.getWidth())+j]=(byte)((0.3*rr+0.59*gg+0.11*bb));
+              }
+     return new ByteBufferImage(newBytes,orig.getWidth(),orig.getHeight());
     }
     
     public ByteBufferImage swapIJ(ByteBufferImage img) {
