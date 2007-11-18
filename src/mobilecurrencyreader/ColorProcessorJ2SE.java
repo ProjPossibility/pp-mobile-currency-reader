@@ -51,9 +51,7 @@ public class ColorProcessorJ2SE implements ColorProcessor {
                original.bytes[i]=(byte)c;
         }
         
-        
-        for(i=0;i<1000;i++)
-            System.out.print(original.getPixelInt(i)+" ");
+       
         
         return original;
     }
