@@ -318,7 +318,13 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     
     // convert a greyscale byte array to a buffered image
     public BufferedImage byteToBuffered(ByteBufferImage img) {
-        DataBuffer buffer = new DataBufferByte(img.bytes, img.width*img.height);
+        ByteBufferImage copy = new ByteBufferImage(img.width, img.height);
+        for(int i=0;i< img.height; i++) {
+            for(int j=0; j<img.width; j++) {
+                copy.setPixel(i, j, img.getPixel(i, j));
+            }
+        }
+        DataBuffer buffer = new DataBufferByte(copy.bytes, img.width*img.height);
         
         int pixelStride = 1; //assuming r, g, b, skip, r, g, b, skip...
         int scanlineStride = img.width; //no extra padding

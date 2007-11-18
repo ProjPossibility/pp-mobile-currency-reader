@@ -136,4 +136,16 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         
         return original;
     }
+    
+    public ByteBufferImage invert(ByteBufferImage img) {
+        ByteBufferImage out = new ByteBufferImage(img.width, img.height);
+        for (int i=0; i<img.height; i++) {
+            for (int j=0; j<img.width; j++) {
+                int old = img.getPixelInt(i, j);
+                int diff = old - 127;
+                out.setPixel(i, j, (byte)(128 - diff));
+            }
+        }
+        return out;
+    }
 }
