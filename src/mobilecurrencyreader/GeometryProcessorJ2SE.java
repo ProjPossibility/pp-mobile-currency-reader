@@ -77,10 +77,28 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
 }
     
 
-    public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation) {
-        return null;
+public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,double i0,double j0) {
+        double angle = Math.toRadians(angleOfRotation);
+        double sin = Math.sin(angle);
+        double cos = Math.cos(angle);
+		byte[] source = orig.bytes;
+        byte[] dest = new byte[source.length];
+        
+        for (int i = 0; i < orig.height; ++i) {
+            for (int j = 0; j < orig.width; ++j) {
+                double transI = i - i0;
+                double transJ = j - j0;
+                double rotJ = transJ * cos - transI * sin;
+                double rotI = transJ * sin + transI * cos;
+                int finalI = (int)Math.round(rotI + i0);
+                int finalJ = (int)Math.round(rotJ + j0);
+                if (finalI >= 0 && finalI <orig.height && finalJ >=0 && finalJ < orig.width) {
+                    dest[finalI * orig.width + finalJ] = source[i * orig.width + j];
+                }
+            }
+        }
+		return new ByteBufferImage(dest,orig.height,orig.width);
     }
-
     public ByteBufferImage scaleImage(ByteBufferImage orig, double tx, double ty) {
         int scaleBuf[][] = new int[orig.height][orig.width];
         int TscaleBuf[][] = new int[orig.height][orig.width];
