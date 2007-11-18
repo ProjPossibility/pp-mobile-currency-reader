@@ -18,7 +18,10 @@ public interface GeometryProcessor {
     public ByteBufferImage translateImage(ByteBufferImage orig, int tx, int ty);
     public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation);
     public ByteBufferImage cropImage(ByteBufferImage orig, int tx, int ty, int newWidth, int newHeight);
-    public ByteBufferImage scaleImage(ByteBufferImage orig, int sx, int sy);
+
+    public ByteBufferImage scaleImage(ByteBufferImage orig, double sx, double sy);
+
     public ByteBufferImage extractImage(ByteBufferImage orig, Point verticeArray[]);   
     public ByteBufferImage detectVertices(ByteBufferImage img);
+    
 }
