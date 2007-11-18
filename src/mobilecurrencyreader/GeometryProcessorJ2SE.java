@@ -44,8 +44,103 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return null;
     }
 
-    public ByteBufferImage scaleImage(ByteBufferImage orig, float sx, float sy) {
-        return null;
+    public ByteBufferImage scaleImage(ByteBufferImage orig, int tx, int ty) {
+        
+        
+        int translateBuf[][] = new int[orig.height][orig.width];
+        int i,j,k,l,count;
+        int startIndexX,startIndexY,endIndexX,endIndexY;
+   
+        for(i=0;i<orig.height;i++)
+        {
+            for(j=0;j<orig.width;j++)
+            {
+                if((ty==1) && (tx==1))
+                    
+                 {
+                    translateBuf[i][j]= orig.getPixelInt((int)i,(int)j);
+                    
+                }else if((tx==1) && (ty!=1))
+                {
+                     if (j%ty==0)
+                   translateBuf[i][j]= orig.getPixelInt((int)i,(int)j/ty);
+                else
+                    translateBuf[i][j]=500;
+                }
+                else if((ty==1) && (tx!=1))
+                {
+                     if (i%tx==0)
+                   translateBuf[i][j]= orig.getPixelInt((int)i/tx,(int)j);
+                else
+                    translateBuf[i][j]=500;
+                }
+             
+                else
+                {
+           
+                if ((i%tx==0)||(j%ty==0))
+                   translateBuf[i][j]= orig.getPixelInt((int)i/tx,(int)j/ty);
+                else
+                    translateBuf[i][j]=500;
+                }
+                
+            }
+            
+        }
+        
+        
+        if((tx!=1)||(ty!=1))
+        {
+        
+        for(i=0;i<orig.height;i++)
+        {
+                         
+                
+            for(j=0;j<orig.width;j++)
+            {
+              if(translateBuf[i][j]==500)
+              {
+                 startIndexX=i-(i/tx)<0?i-(i/tx):0;
+                endIndexX=i+(tx-i/tx)>orig.width-1?orig.width:i+(tx-i/tx);
+                startIndexY=j-(j/ty)<0?j-(j/ty):0;
+                endIndexY=j+(ty-j/ty)>orig.height-1?orig.height:i+(ty-j/ty);
+                count=0;
+                 int val=0;
+                 
+                 for(k=startIndexX;k<=endIndexX;k++)
+                 {
+                     for(l=startIndexX;l<=endIndexX;l++)
+                     {
+                          if(translateBuf[k][l]!=500)
+                          {
+                               val+=translateBuf[k][l];
+                               count++;
+                               
+                          }
+                     }
+                      
+                     }
+                  translateBuf[i][j]=val/count;
+                 
+              }
+                  
+            }
+            
+        }
+        }
+        
+         for(i=0;i<orig.height;i++)
+        {
+                    
+            for(j=0;j<orig.width;j++)
+            {
+                orig.setPixel(i,j,(byte)translateBuf[i][j]);
+            }
+         }
+            
+            
+        
+        return orig;
     }
     
     public ByteBufferImage cropImage(ByteBufferImage orig, int tx, int ty, int newWidth, int newHeight) {
@@ -61,7 +156,9 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     }
 
     public ByteBufferImage extractImage(ByteBufferImage origt, Point[] verticeArray) {
-        return null;
+        
+        
+        return origt;
     }
     
     public boolean isFeature(ByteBufferImage img, int iIn, int jIn) {
