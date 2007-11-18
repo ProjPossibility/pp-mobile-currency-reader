@@ -82,95 +82,76 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return null;
     }
 
-    public ByteBufferImage scaleImage(ByteBufferImage orig, int tx, int ty) {
-        int translateBuf[][] = new int[orig.height][orig.width];
+    public ByteBufferImage scaleImage(ByteBufferImage orig, double tx, double ty) {
+        int scaleBuf[][] = new int[orig.height][orig.width];
+        int TscaleBuf[][] = new int[orig.height][orig.width];
         int i,j,k,l,count;
-        int startIndexX,startIndexY,endIndexX,endIndexY;
+        int startX,startY,lastX,lastY;
    
         for(i=0;i<orig.height;i++)
         {
             for(j=0;j<orig.width;j++)
             {
-                if((ty==1) && (tx==1))
-                    
-                 {
-                    translateBuf[i][j]= orig.getPixelInt((int)i,(int)j);
-                    
-                }else if((tx==1) && (ty!=1))
-                {
-                     if (j%ty==0)
-                   translateBuf[i][j]= orig.getPixelInt((int)i,(int)j/ty);
-                else
-                    translateBuf[i][j]=500;
-                }
-                else if((ty==1) && (tx!=1))
-                {
-                     if (i%tx==0)
-                   translateBuf[i][j]= orig.getPixelInt((int)i/tx,(int)j);
-                else
-                    translateBuf[i][j]=500;
-                }
-             
-                else
-                {
-           
-                if ((i%tx==0)||(j%ty==0))
-                   translateBuf[i][j]= orig.getPixelInt((int)i/tx,(int)j/ty);
-                else
-                    translateBuf[i][j]=500;
-                }
-                
+               scaleBuf[i][j]=500;
             }
-            
         }
-        
+        for(i=0;i<orig.height;i++)
+        {
+            for(j=0;j<orig.width;j++)
+            {
+                if(((int)(i*tx)<orig.height)&&((int)(j*ty)<orig.width))
+                    scaleBuf[(int)(i*tx)][(int)(j*ty)]=orig.getPixelInt(i,j);
+            }
+        }
+         int val;
         
         if((tx!=1)||(ty!=1))
         {
-        
-        for(i=0;i<orig.height;i++)
-        {
-                         
-                
-            for(j=0;j<orig.width;j++)
+           for(i=0;i<orig.height;i++)
             {
-              if(translateBuf[i][j]==500)
-              {
-                 startIndexX=i-(i/tx)<0?i-(i/tx):0;
-                endIndexX=i+(tx-i/tx)>orig.width-1?orig.width:i+(tx-i/tx);
-                startIndexY=j-(j/ty)<0?j-(j/ty):0;
-                endIndexY=j+(ty-j/ty)>orig.height-1?orig.height:i+(ty-j/ty);
-                count=0;
-                 int val=0;
-                 
-                 for(k=startIndexX;k<=endIndexX;k++)
-                 {
-                     for(l=startIndexX;l<=endIndexX;l++)
-                     {
-                          if(translateBuf[k][l]!=500)
-                          {
-                               val+=translateBuf[k][l];
-                               count++;
-                               
-                          }
-                     }
-                      
-                     }
-                  translateBuf[i][j]=val/count;
-                 
-              }
-                  
+                for(j=0;j<orig.width;j++)
+                {
+                  if(scaleBuf[i][j]==500)
+                  {
+                    startX=(int)(i-3>0?i-3:0);
+		    startY=(int)(j-3>0?j-3:0);
+		    lastX=(int)(i+3<orig.height?i+3:orig.height);
+		    lastY=(int)(j+3<orig.width?j+3:orig.width);
+                    count=0;
+                     val=0;
+                     
+				for(k=startX;k<lastX;k++)
+				for(l=startY;l<lastY;l++)
+				{
+					if(scaleBuf[k][l]!=500)
+					{
+					val+=scaleBuf[k][l];
+					
+						count++;
+					}
+				}
+				if(count!=0)
+				TscaleBuf[i][j]=val/count;
+				
+                  }
+                  else
+                  {
+                      TscaleBuf[i][j]= scaleBuf[i][j];
+                  }
+                }
             }
-            
         }
-        }
+        
+        
+        
+        
         
          for(i=0;i<orig.height;i++)
         {
                     
             for(j=0;j<orig.width;j++)
             {
-                orig.setPixel(i,j,(byte)translateBuf[i][j]);
+                orig.setPixel(i,j,(byte)TscaleBuf[i][j]);
             }
          }
             
@@ -310,7 +291,7 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         
         for (int i = 0; i < points.size(); i++) {
             Point p = points.get(i);
-            img.drawBox(p.x, p.y, 5, (byte)0xFF); 
+           // img.drawBox(p.x, p.y, 5, (byte)0xFF); 
         }
         
         return img;
