@@ -36,9 +36,47 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         
     }
 
-    public ByteBufferImage translateImage(ByteBufferImage orig, int tx, int ty) {
-        return null;
-    }
+    public byte[] translateImage(byte[] bytes, int width, int height, int tx, int ty) {
+      int size=width*height;
+     byte newBytes[]=new byte[size];
+     int i,j=0;
+     int newI,newJ;
+     int boundI,boundJ,InitJ;
+     if(tx<0)
+     {
+        i=-tx;
+        boundI=height;
+      }
+     else
+     {
+         i=0;
+         boundI=height-tx;
+     }
+     if(ty<0)
+     {
+        boundJ=width;
+        InitJ=-ty;
+     }
+  
+     else
+     {
+        InitJ=0;
+         boundJ=width-ty;
+     }
+         
+     for( ;i<boundI;i++)
+     {
+           newI=i+((tx));
+         for(j=InitJ;j<boundJ;j++){
+           {
+               newJ=j+((ty));
+               newBytes[newI*width+newJ]=bytes[i*width+j];  
+           }
+      }
+   }
+     return newBytes;
+}
+    
 
     public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation) {
         return null;
