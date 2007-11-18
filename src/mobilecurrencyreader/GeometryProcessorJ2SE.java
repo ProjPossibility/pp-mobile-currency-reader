@@ -62,8 +62,13 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     public ByteBufferImage extractImage(ByteBufferImage origt, Point[] verticeArray) {
         return null;
     }
+    
+    public boolean insideObject(ByteBufferImage image, int x, int y) {
+        return image.getPixelInt(x,y) < 200;
+    }
 
-    public Point[] detectVertices(ByteBufferImage img) {
+    public Point[] detectVertices(ByteBufferImage image) {
+        
         return null;
     }
     
