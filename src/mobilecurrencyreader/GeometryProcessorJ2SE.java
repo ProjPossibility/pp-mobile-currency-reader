@@ -52,7 +52,7 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         int dest=0;
         for (int i=ty; i<ty+newHeight; i++) {
             for (int j=tx; j<tx+newWidth; j++, dest++) {
-                out.bytes[dest] = orig.getPixel(j, i);
+                out.bytes[dest] = orig.getPixel(i, j);
             }
         }
         
@@ -63,13 +63,13 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return null;
     }
     
-    public boolean isFeature(ByteBufferImage img, int x, int y) {
-        if (img.getPixelInt(x, y) < 128) {
+    public boolean isFeature(ByteBufferImage img, int iIn, int jIn) {
+        if (img.getPixelInt(iIn, jIn) < 128) {
             int num = 0;
             int total = 0;
-            for (int i=y-1; i<=y+1; i++) {
-                for (int j=x-1; j<=x+1; j++) {
-                    if (!(j == x && i == y) && i>=0 && j >=0 && i<img.height && j < img.width) {
+            for (int i=iIn-1; i<=iIn+1; i++) {
+                for (int j=jIn-1; j<=jIn+1; j++) {
+                    if (!(j == jIn && i == iIn) && i>=0 && j >=0 && i<img.height && j < img.width) {
                         total += img.getPixelInt(j, i);
                         num++;
                     }
@@ -85,11 +85,11 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     
     public ByteBufferImage testFeature(ByteBufferImage img) {
         ByteBufferImage out = new ByteBufferImage(img.width, img.height);
-        for (int x=0; x<img.width; x++) {
-            for (int y=0; y<img.height; y++) {
-                if (isFeature(img, x, y)) {
-                    out.setPixel(x, y, (byte)0);
-                } else out.setPixel(x, y, (byte)255);
+        for (int i=0; i<img.height; i++) {
+            for (int j=0; j<img.width; j++) {
+                if (isFeature(img, i, j)) {
+                    out.setPixel(i, j, (byte)0);
+                } else out.setPixel(i, j, (byte)255);
             }
         }
         return out;

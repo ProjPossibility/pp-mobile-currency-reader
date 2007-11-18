@@ -23,11 +23,14 @@ public class Main {
         TestWindow window = new TestWindow();
         File imageFile = new File("testImage.jpg");
         GeometryProcessorJ2SE geom = new GeometryProcessorJ2SE();
+        ColorProcessorJ2SE color = new ColorProcessorJ2SE();
         
         try {
             BufferedImage orig = ImageIO.read(imageFile);
             BufferedImage image = Main.convertToGraySclae(orig);
             ByteBufferImage bytes = geom.bufferedToByte(image);
+            bytes = color.expandDynamicRange(bytes);
+            bytes = color.quantize(bytes, 2);
             int newWidth = 332;
             int newHeight = 143;
             //bytes = geom.cropImage(bytes, 54, 71, newWidth, newHeight);
@@ -44,7 +47,7 @@ public class Main {
         window.setVisible(true);
     }
     
-    public static BufferedImage convertToGraySclae(BufferedImage img){
+    public static BufferedImage convertToGraySclae(BufferedImage img) {
         int width=img.getWidth();
         int height = img.getHeight();
         int type = java.awt.image.BufferedImage.TYPE_BYTE_GRAY;

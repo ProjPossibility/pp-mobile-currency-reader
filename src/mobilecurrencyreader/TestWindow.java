@@ -26,6 +26,8 @@ public class TestWindow extends JFrame implements ActionListener {
     public TestWindow() {
         super();
         
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
         this.setSize(new Dimension(800,400));
         
         //this.setLayout(box);

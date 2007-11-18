@@ -18,20 +18,20 @@ public class ByteBufferImage {
         this.width = width;
         this.height = height;
     }
-    public void setPixel(int x, int y, byte val) {
-        bytes[y * width + x] = val;
+    public void setPixel(int i, int j, byte val) {
+        bytes[i * width + j] = val;
     }
     public void setPixel(int i, byte val) {
         bytes[i] = val;
     }
-    public byte getPixel(int x, int y) {
-        return bytes[y * width + x];
+    public byte getPixel(int i, int j) {
+        return bytes[i * width + j];
     }
-    public int getPixelInt(int x, int y) {
-        return (int)(bytes[y * width + x]&0xff);
+    public int getPixelInt(int i, int j) {
+        return (int)(bytes[i * width + j]&0xff);
     }
-    public double getPixelDouble(int x, int y) {
-        return (double)(bytes[y * width + x]&0xff);
+    public double getPixelDouble(int i, int j) {
+        return (double)(bytes[i * width + j]&0xff);
     }
     public byte getPixel(int i) {
         return bytes[i];
