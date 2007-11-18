@@ -36,8 +36,8 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         
     }
 
-    public byte[] translateImage(byte[] bytes, int width, int height, int tx, int ty) {
-      int size=width*height;
+    public ByteBufferImage translateImage(ByteBufferImage bytes, int tx, int ty) {
+      int size=bytes.width*bytes.height;
      byte newBytes[]=new byte[size];
      int i,j=0;
      int newI,newJ;
@@ -45,23 +45,23 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
      if(tx<0)
      {
         i=-tx;
-        boundI=height;
+        boundI=bytes.height;
       }
      else
      {
          i=0;
-         boundI=height-tx;
+         boundI=bytes.height-tx;
      }
      if(ty<0)
      {
-        boundJ=width;
+        boundJ=bytes.width;
         InitJ=-ty;
      }
   
      else
      {
         InitJ=0;
-         boundJ=width-ty;
+         boundJ=bytes.width-ty;
      }
          
      for( ;i<boundI;i++)
@@ -70,11 +70,11 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
          for(j=InitJ;j<boundJ;j++){
            {
                newJ=j+((ty));
-               newBytes[newI*width+newJ]=bytes[i*width+j];  
+               newBytes[newI*bytes.width+newJ]=bytes.bytes[i*bytes.width+j];  
            }
       }
    }
-     return newBytes;
+     return new ByteBufferImage(newBytes,bytes.width,bytes.height);
 }
     
 
