@@ -45,8 +45,6 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     }
 
     public ByteBufferImage scaleImage(ByteBufferImage orig, int tx, int ty) {
-        
-        
         int translateBuf[][] = new int[orig.height][orig.width];
         int i,j,k,l,count;
         int startIndexX,startIndexY,endIndexX,endIndexY;
@@ -204,30 +202,32 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
                 max_col = j;
             }
         }
-        int ret[] = new int[2];
-        ret[0] = min_col;
-        ret[1] = max_col;
-        return ret;
+        return (min_col < 0) ? null : new int[] {min_col, max_col};
     }
     
     private ArrayList<Point> findVerticeRecurse(ByteBufferImage img, int min_row, int max_row, int last_row) {
         System.out.println("min_row=" + min_row + " max_row=" + max_row + " last_row=" + last_row);
         if (Math.abs(max_row-min_row) <= 1) {
-            int col_range[] = getMinMaxFeature(img, max_row);
             ArrayList<Point> list = new ArrayList<Point>();
-            if (col_range[0] < 0) {
-                System.out.println("no vertex found");
+            
+            int col_range[] = (min_row == last_row) ? getMinMaxFeature(img, max_row) : getMinMaxFeature(img, min_row);
+            if (col_range == null)
+                col_range = (min_row == last_row) ? getMinMaxFeature(img, min_row) : getMinMaxFeature(img, max_row);
+              
+            if (col_range == null) {
+                System.out.println("WARNING: no vertex found (should not occur)");
             } else {
-                System.out.println("min_row=" + min_row + " max_row=" + max_row + " min_col=" + col_range[0] + " max_col=" + col_range[1]);
-                list.add(new Point((col_range[0]+col_range[1])/2, (min_row+max_row)/2));
+                Point p = new Point((col_range[0]+col_range[1])/2, (min_row+max_row)/2);
+                System.out.println("x=" + p.x + " y=" + p.y + " (min_row=" + min_row + " max_row=" + max_row + " min_col=" + col_range[0] + " max_col=" + col_range[1] + ")");
+                list.add(p);
             }
             return list;
         } else {
             int middle = (max_row+min_row)/2;
             int col_range[] = getMinMaxFeature(img, middle);
             
-            ArrayList newlist;
-            if (col_range[0] < 0) {
+            ArrayList<Point> newlist;
+            if (col_range == null) {
                 // no features on middle
                 if (middle < last_row)
                     newlist = findVerticeRecurse(img, middle, max_row, last_row);
@@ -316,4 +316,5 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         }
         return out;
     }
+
 }
