@@ -9,6 +9,8 @@
 
 package mobilecurrencyreader;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import javax.crypto.NullCipher;
 
 /**
@@ -62,11 +64,6 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         return rmsVal;
        
     }
-
-    public ByteBufferImage convertToGrayscale(byte[][] original, int height, int width) {
-        return null;
-
-    }
     public double[] calculateHistogram(ByteBufferImage original) {
         double hist[] = new double[256];
         
@@ -97,6 +94,14 @@ public class ColorProcessorJ2SE implements ColorProcessor {
             for (int j = x0; j < x1; j++)
                 sum += Math.pow(image.getPixelDouble(i,j) - mean, 2);
         return Math.sqrt(sum/((x1-x0)*(y1-y0)));
+    }
+
+    public byte[] quantize(byte[] original, int N) {
+        return null;
+    }
+
+    public double subtractImage(byte[] original, byte[] compare) {
+        return 0D;
     }
     
     private static double calculateMean(ByteBufferImage image, int x0, int y0, int x1, int y1) {
