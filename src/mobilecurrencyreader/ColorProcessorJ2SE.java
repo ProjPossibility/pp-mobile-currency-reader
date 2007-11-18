@@ -23,22 +23,37 @@ public class ColorProcessorJ2SE implements ColorProcessor {
 
 
      
-    public ByteBufferImage quantize(ByteBufferImage original, int N)
+    public ByteBufferImage quantize(ByteBufferImage original, int Colors)
     {
         int i,c;
         
   
+        
+        int N=256/Colors;
+        
+        
         for(i=0;i<original.bytes.length;i++)
         {
-            //convert to integer
-               c=original.getPixelInt(i);
-               //divide by N to get base factor and multiply by N
-        
-                c=(c/N)*N;
+            
+            c=(int)(original.getPixelInt(i));
+            
+            if(c>(N*(Colors-1))&&c<256)
+                c=255;
+            else
+            {
+               
+                     c=(c/N)*N;
+                    
+            }
+                
                    
                //copy value back to original array
                original.bytes[i]=(byte)c;
         }
+        
+        
+        for(i=0;i<1000;i++)
+            System.out.print(original.getPixelInt(i)+" ");
         
         return original;
     }
