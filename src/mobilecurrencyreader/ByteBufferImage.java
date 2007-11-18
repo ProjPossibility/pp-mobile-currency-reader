@@ -18,7 +18,12 @@ public class ByteBufferImage {
         this.width = width;
         this.height = height;
     }
-    
+    public void setPixel(int x, int y, byte val) {
+        bytes[y * width + x] = val;
+    }
+    public void setPixel(int i, byte val) {
+        bytes[i] = val;
+    }
     public byte getPixel(int x, int y) {
         return bytes[y * width + x];
     }

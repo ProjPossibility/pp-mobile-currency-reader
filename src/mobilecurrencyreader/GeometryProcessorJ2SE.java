@@ -63,8 +63,36 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return null;
     }
     
-    public boolean insideObject(ByteBufferImage image, int x, int y) {
-        return image.getPixelInt(x,y) < 200;
+    public boolean isFeature(ByteBufferImage img, int x, int y) {
+        if (img.getPixelInt(x, y) < 128) {
+            int num = 0;
+            int total = 0;
+            for (int i=y-1; i<=y+1; i++) {
+                for (int j=x-1; j<=x+1; j++) {
+                    if (!(j == x && i == y) && i>=0 && j >=0 && i<img.height && j < img.width) {
+                        total += img.getPixelInt(j, i);
+                        num++;
+                    }
+                }
+            }
+            float avg = (float)total / (float) num;
+            if (avg < 128)
+                return true;
+            else
+                return false;
+        } else return false;
+    }
+    
+    public ByteBufferImage testFeature(ByteBufferImage img) {
+        ByteBufferImage out = new ByteBufferImage(img.width, img.height);
+        for (int x=0; x<img.width; x++) {
+            for (int y=0; y<img.height; y++) {
+                if (isFeature(img, x, y)) {
+                    out.setPixel(x, y, (byte)0);
+                } else out.setPixel(x, y, (byte)255);
+            }
+        }
+        return out;
     }
 
     public Point[] detectVertices(ByteBufferImage image) {

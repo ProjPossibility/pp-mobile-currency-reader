@@ -30,7 +30,8 @@ public class Main {
             ByteBufferImage bytes = geom.bufferedToByte(image);
             int newWidth = 332;
             int newHeight = 143;
-            bytes = geom.cropImage(bytes, 54, 71, newWidth, newHeight);
+            //bytes = geom.cropImage(bytes, 54, 71, newWidth, newHeight);
+            bytes = geom.testFeature(bytes);
             BufferedImage converted = geom.byteToBuffered(bytes);
             window.setLeftImage(orig);
             if (converted != null)
