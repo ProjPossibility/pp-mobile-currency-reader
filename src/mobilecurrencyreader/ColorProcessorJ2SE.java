@@ -21,18 +21,52 @@ public class ColorProcessorJ2SE implements ColorProcessor {
     public ColorProcessorJ2SE() {
     }
 
-    public ByteBufferImage quantize(ByteBufferImage original, int N) {
-        return null;
-    }
 
-    public double subtractImage(ByteBufferImage a, ByteBufferImage b) {
-        return 0;
+     
+    public ByteBufferImage quantize(ByteBufferImage original, int N)
+    {
+        int i,c;
+        
+  
+        for(i=0;i<original.bytes.length;i++)
+        {
+            //convert to integer
+               c=(int)(original.bytes[i] & 0xff);
+               //divide by N to get base factor and multiply by N
+        
+                c=(c/N)*N;
+                   
+               //copy value back to original array
+               original.bytes[i]=(byte)c;
+        }
+        
+        return original;
+    }
+        
+
+    public double subtractImage(ByteBufferImage orig, ByteBufferImage compare)
+    {
+        
+        int sumOfSquares=0,i=0;
+        double rmsVal;
+        if (orig.bytes.length!=compare.bytes.length)
+        {
+            return 5000;
+        }
+        for(i=0;i<orig.bytes.length;i++)
+        {
+            sumOfSquares+= ((int)orig.bytes[i]-(int)compare.bytes[i])*((int)orig.bytes[i]-(int)compare.bytes[i]);
+        }
+        rmsVal=sumOfSquares/orig.bytes.length;
+        rmsVal=Math.sqrt(rmsVal);
+        return rmsVal;
+       
     }
 
     public ByteBufferImage convertToGrayscale(byte[][] original, int height, int width) {
         return null;
+
     }
-    
     public double[] calculateHistogram(ByteBufferImage original) {
         double hist[] = new double[256];
         
@@ -56,7 +90,7 @@ public class ColorProcessorJ2SE implements ColorProcessor {
       
         return hist;
     }
-    
+
     private static double calculateStdDev(ByteBufferImage image, double mean) {
         double sum = 0.0;
         for (int i = 0; i < image.bytes.length; i++)
@@ -93,4 +127,5 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         return original;
     }
     
+
 }
