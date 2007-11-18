@@ -15,10 +15,10 @@ import java.awt.Point;
  * @author binarygame
  */
 public interface GeometryProcessor {
-    public byte [] translateImage(byte orig[], int width,int height, int tx, int ty);
-    public byte [] rotateImage(byte orig[], int width,int height, float angleOfRotation);
-    public byte [] cropImage(byte orig[], int origWidth,int origHeight, int tx, int ty, int newWidth, int newHeight);
-    public byte []  scaleImage(byte orig[], int width,int height, float sx, float sy);
-    public byte []  extractImage(byte orig[], int width, int height,Point  verticeArray[] );   
-    public Point[] detectVertices(byte img[], int width, int height);
+    public ByteBufferImage translateImage(ByteBufferImage orig, int tx, int ty);
+    public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation);
+    public ByteBufferImage cropImage(ByteBufferImage orig, int tx, int ty, int newWidth, int newHeight);
+    public ByteBufferImage scaleImage(ByteBufferImage orig, float sx, float sy);
+    public ByteBufferImage extractImage(ByteBufferImage orig, Point verticeArray[]);   
+    public Point[] detectVertices(ByteBufferImage img);
 }

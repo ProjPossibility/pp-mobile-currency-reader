@@ -27,11 +27,11 @@ public class Main {
         try {
             BufferedImage orig = ImageIO.read(imageFile);
             BufferedImage image = Main.convertToGraySclae(orig);
-            byte[] bytes = geom.bufferedToByte(image);
+            ByteBufferImage bytes = geom.bufferedToByte(image);
             int newWidth = 332;
             int newHeight = 143;
-            bytes = geom.cropImage(bytes, image.getWidth(), image.getHeight(), 54, 71, newWidth, newHeight);
-            BufferedImage converted = geom.byteToBuffered(bytes, newWidth, newHeight);
+            bytes = geom.cropImage(bytes, 54, 71, newWidth, newHeight);
+            BufferedImage converted = geom.byteToBuffered(bytes);
             window.setLeftImage(orig);
             if (converted != null)
                 window.setRightImage(converted);

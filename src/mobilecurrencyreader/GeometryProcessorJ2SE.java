@@ -35,47 +35,46 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         
     }
 
-    public byte[] translateImage(byte[] orig, int width, int height, int tx, int ty) {
+    public ByteBufferImage translateImage(ByteBufferImage orig, int tx, int ty) {
         return null;
     }
 
-    public byte[] rotateImage(byte[] orig, int width, int height, float angleOfRotation) {
+    public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation) {
         return null;
     }
 
-    public byte[] scaleImage(byte[] orig, int width, int height, float sx, float sy) {
+    public ByteBufferImage scaleImage(ByteBufferImage orig, float sx, float sy) {
         return null;
     }
     
-    public byte [] cropImage(byte orig[], int width,int height, int tx, int ty, int newWidth, int newHeight) {
-        byte out[] = new byte[newWidth*newHeight];
+    public ByteBufferImage cropImage(ByteBufferImage orig, int tx, int ty, int newWidth, int newHeight) {
+        ByteBufferImage out = new ByteBufferImage(newWidth, newHeight);
         int dest=0;
         for (int i=ty; i<ty+newHeight; i++) {
             for (int j=tx; j<tx+newWidth; j++, dest++) {
-                //int dest = (i-ty)*newWidth + (j-tx);
-                out[dest] = getPixel(orig, i, j, width);
+                out.bytes[dest] = getPixel(orig, i, j);
             }
         }
         
         return out;
     }
 
-    public byte[] extractImage(byte[] orig, int width, int height, Point[] verticeArray) {
+    public ByteBufferImage extractImage(ByteBufferImage origt, Point[] verticeArray) {
         return null;
     }
 
-    public Point[] detectVertices(byte[] img, int width, int height) {
+    public Point[] detectVertices(ByteBufferImage img) {
         return null;
     }
     
     // convert a greyscale byte array to a buffered image
-    public BufferedImage byteToBuffered(byte[] img, int width, int height) {
-        DataBuffer buffer = new DataBufferByte(img, width*height);
+    public BufferedImage byteToBuffered(ByteBufferImage img) {
+        DataBuffer buffer = new DataBufferByte(img.bytes, img.width*img.height);
         
         int pixelStride = 1; //assuming r, g, b, skip, r, g, b, skip...
-        int scanlineStride = width; //no extra padding
+        int scanlineStride = img.width; //no extra padding
         int[] bandOffsets = {0};
-        WritableRaster raster = Raster.createInterleavedRaster(buffer, width, height, scanlineStride, pixelStride, bandOffsets, null);
+        WritableRaster raster = Raster.createInterleavedRaster(buffer, img.width, img.height, scanlineStride, pixelStride, bandOffsets, null);
         //WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, width, height, 1, null);
         
         ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
@@ -89,15 +88,15 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     }
     
     // converts a buffered image to a byte array
-    public byte[] bufferedToByte(BufferedImage img) {
+    public ByteBufferImage bufferedToByte(BufferedImage img) {
         DataBuffer buf = img.getData().getDataBuffer();
-        byte bytes[] = new byte[buf.getSize()];
+        ByteBufferImage newImg = new ByteBufferImage(img.getWidth(), img.getHeight());
         for (int i = 0; i < buf.getSize(); i++)
-            bytes[i] = (byte)buf.getElem(i);
-        return bytes;
+            newImg.bytes[i] = (byte)buf.getElem(i);
+        return newImg;
     }
     
-    public byte getPixel(byte[] img, int i, int j, int width) {
-        return img[i * width + j];
+    public byte getPixel(ByteBufferImage img, int i, int j) {
+        return img.bytes[i * img.width + j];
     }
 }
