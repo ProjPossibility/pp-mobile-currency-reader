@@ -48,10 +48,16 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     }
     
     public byte [] cropImage(byte orig[], int width,int height, int tx, int ty, int newWidth, int newHeight) {
-        BufferedImage reader = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-        BufferedImage out = reader.getSubimage(tx,ty,newWidth,newHeight);
+        byte out[] = new byte[newWidth*newHeight];
+        int dest=0;
+        for (int i=ty; i<ty+newHeight; i++) {
+            for (int j=tx; j<tx+newWidth; j++, dest++) {
+                //int dest = (i-ty)*newWidth + (j-tx);
+                out[dest] = getPixel(orig, i, j, width);
+            }
+        }
         
-        return null;
+        return out;
     }
 
     public byte[] extractImage(byte[] orig, int width, int height, Point[] verticeArray) {
@@ -62,6 +68,7 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return null;
     }
     
+    // convert a greyscale byte array to a buffered image
     public BufferedImage byteToBuffered(byte[] img, int width, int height) {
         DataBuffer buffer = new DataBufferByte(img, width*height);
         
@@ -81,20 +88,16 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
     }
     
+    // converts a buffered image to a byte array
     public byte[] bufferedToByte(BufferedImage img) {
         DataBuffer buf = img.getData().getDataBuffer();
         byte bytes[] = new byte[buf.getSize()];
         for (int i = 0; i < buf.getSize(); i++)
             bytes[i] = (byte)buf.getElem(i);
-        
-        //img.getData().getDataBuffer()
-        //ByteArrayInputStream stream = new ByteArrayInputStream(img);
-        //try {
-            //return ImageIO.read(stream);
-        //} catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
         return bytes;
     }
     
+    public byte getPixel(byte[] img, int i, int j, int width) {
+        return img[i * width + j];
+    }
 }
