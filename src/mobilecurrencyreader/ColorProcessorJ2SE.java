@@ -31,7 +31,7 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         for(i=0;i<original.bytes.length;i++)
         {
             //convert to integer
-               c=(int)(original.bytes[i] & 0xff);
+               c=original.getPixelInt(i);
                //divide by N to get base factor and multiply by N
         
                 c=(c/N)*N;
@@ -76,7 +76,7 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         
         // increment histogram "bucket" for each pixel
         for (int i = 0; i < original.bytes.length; i++)
-            hist[(int)(original.bytes[i]&0xff)]++;
+            hist[original.getPixelInt(i)]++;
         
         // calculate max
         double max = 0.0;
@@ -94,14 +94,14 @@ public class ColorProcessorJ2SE implements ColorProcessor {
     private static double calculateStdDev(ByteBufferImage image, double mean) {
         double sum = 0.0;
         for (int i = 0; i < image.bytes.length; i++)
-            sum += Math.pow((double)(image.bytes[i]&0xff) - mean, 2);
+            sum += Math.pow(image.getPixelDouble(i) - mean, 2);
         return Math.sqrt(sum/image.bytes.length);
     }
     
     private static double calculateMean(ByteBufferImage image) {
         double sum = 0.0;
         for (int i = 0; i < image.bytes.length; i++)
-            sum += (double)(image.bytes[i]&0xff);
+            sum += image.getPixelDouble(i);
         return sum / image.bytes.length;
     }
     
@@ -114,7 +114,7 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         double min = mean - sd;
         
         for (int i = 0; i < original.bytes.length; i++) {
-            long scaled = Math.round(((double)(original.bytes[i]&0xff) - min) * (256 / (2 * sd)));
+            long scaled = Math.round((original.getPixelDouble(i) - min) * (256 / (2 * sd)));
             if (scaled < 0)
                 original.bytes[i] = 0;
             else if (scaled > 255)
