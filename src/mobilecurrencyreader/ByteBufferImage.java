@@ -18,4 +18,8 @@ public class ByteBufferImage {
         this.width = width;
         this.height = height;
     }
+    
+    public byte getPixel(int x, int y) {
+        return bytes[y * width + x];
+    }
 }

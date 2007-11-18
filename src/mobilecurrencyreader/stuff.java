@@ -55,7 +55,7 @@ public class stuff {
         AffineTransform affineTransform = new AffineTransform();
         affineTransform.rotate(degrees * Math.PI / 180.0,anchorX,anchorY); 
          BufferedImageOp bio = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
-           BufferedImage destinationBI = bio.filter(sourceBi, null);
+           //BufferedImage destinationBI = bio.filter(sourceBi, null);
         
     }
     
@@ -82,11 +82,11 @@ public class stuff {
     public  byte [] translateImage(byte orig[], int width,int height, int tx, int ty){
      BufferedImage sourceBi; /* have to initialise here */
      
-     Graphics2D g = sourceBi.createGraphics();
-     g.translate(tx,ty);
+     //Graphics2D g = sourceBi.createGraphics();
+     //g.translate(tx,ty);
      
      
-     
+     return null;
     }
     
     /**
