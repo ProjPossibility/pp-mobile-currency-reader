@@ -1,0 +1,29 @@
+  int minX=800;
+        int maxX=-1;
+        int minY=800;
+        int maxY=-1;
+        for(int i=0;i<4;i++)
+        {
+            if (vertexpoint[i].x<minX)
+            {
+                minX=vertexpoint[i].x;
+            }
+             if (vertexpoint[i].y<minY)
+            {
+                minY=vertexpoint[i].y;
+            }
+             if (vertexpoint[i].x>maxX)
+            {
+                maxX=vertexpoint[i].x;
+            }
+             if (vertexpoint[i].y>maxY)
+            {
+                maxY=vertexpoint[i].y;
+            }
+        }
+        
+        System.out.println("X: "+ minX+" y:"+ minY+" lx:"+maxX+" ly:"+maxY);
+        origByte= geom.translateImage(origByte,-minX,-minY);
+        double sx=(double)((double)origByte.width/(double)(maxX-minX));
+        double sy=(double)((double)origByte.height/(double)(maxY-minY));
+        origByte=geom.scaleImage(origByte,sy,sx);
