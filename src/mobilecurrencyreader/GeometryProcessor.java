@@ -8,7 +8,6 @@
  */
 
 package mobilecurrencyreader;
-import java.awt.Point;
 
 /**
  *
@@ -21,7 +20,8 @@ public interface GeometryProcessor {
 
     public ByteBufferImage scaleImage(ByteBufferImage orig, double sx, double sy);
 
-    public ByteBufferImage extractImage(ByteBufferImage orig, Point verticeArray[]);   
-    public ByteBufferImage detectVertices(ByteBufferImage img);
+    public ByteBufferImage extractImage(ByteBufferImage orig, VertexPoint verticeArray[]);   
+    public VertexPoint[] detectAllVertices(ByteBufferImage img);
+    public VertexPoint[] detectCornerVertices(ByteBufferImage img);
     
 }

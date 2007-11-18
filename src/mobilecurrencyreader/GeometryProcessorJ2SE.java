@@ -9,7 +9,6 @@
 
 package mobilecurrencyreader;
 
-import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
@@ -22,7 +21,7 @@ import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Vector;
 import javax.imageio.ImageIO;
 
 /**
@@ -172,7 +171,7 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return out;
     }
 
-    public ByteBufferImage extractImage(ByteBufferImage origt, Point[] verticeArray) {
+    public ByteBufferImage extractImage(ByteBufferImage origt, VertexPoint[] verticeArray) {
         
         
         return origt;
@@ -224,10 +223,10 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return (min_col < 0) ? null : new int[] {min_col, max_col};
     }
     
-    private ArrayList<Point> findVerticeRecurse(ByteBufferImage img, int min_row, int max_row, int last_row) {
+    private Vector<VertexPoint> findVerticesRecursive(ByteBufferImage img, int min_row, int max_row, int last_row) {
         System.out.println("min_row=" + min_row + " max_row=" + max_row + " last_row=" + last_row);
         if (Math.abs(max_row-min_row) <= 1) {
-            ArrayList<Point> list = new ArrayList<Point>();
+            Vector<VertexPoint> list = new Vector<VertexPoint>();
             
             int col_range[] = (min_row == last_row) ? getMinMaxFeature(img, max_row) : getMinMaxFeature(img, min_row);
             if (col_range == null)
@@ -236,7 +235,7 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
             if (col_range == null) {
                 System.out.println("WARNING: no vertex found (should not occur)");
             } else {
-                Point p = new Point((col_range[0]+col_range[1])/2, (min_row+max_row)/2);
+                VertexPoint p = new VertexPoint((col_range[0]+col_range[1])/2, (min_row+max_row)/2, true);
                 System.out.println("x=" + p.x + " y=" + p.y + " (min_row=" + min_row + " max_row=" + max_row + " min_col=" + col_range[0] + " max_col=" + col_range[1] + ")");
                 list.add(p);
             }
@@ -245,37 +244,37 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
             int middle = (max_row+min_row)/2;
             int col_range[] = getMinMaxFeature(img, middle);
             
-            ArrayList<Point> newlist;
+            Vector<VertexPoint> newlist;
             if (col_range == null) {
                 // no features on middle
                 if (middle < last_row)
-                    newlist = findVerticeRecurse(img, middle, max_row, last_row);
+                    newlist = findVerticesRecursive(img, middle, max_row, last_row);
                 else
-                    newlist = findVerticeRecurse(img, min_row, middle, last_row);
+                    newlist = findVerticesRecursive(img, min_row, middle, last_row);
             } else {
                 // feature found
                 if (middle < last_row)
-                    newlist = findVerticeRecurse(img, min_row, middle, middle);
+                    newlist = findVerticesRecursive(img, min_row, middle, middle);
                 else
-                    newlist = findVerticeRecurse(img, middle, max_row, middle);
-                newlist.add(new Point(col_range[0], middle));
-                newlist.add(new Point(col_range[1], middle));
+                    newlist = findVerticesRecursive(img, middle, max_row, middle);
+                newlist.add(new VertexPoint(col_range[0], middle, false));
+                newlist.add(new VertexPoint(col_range[1], middle, false));
             }
             return newlist;
         }
     }
     
-    private ArrayList<Point> getVertices(ByteBufferImage img) {
-        ArrayList<Point> points = new ArrayList<Point>();
-        points.addAll(findVerticeRecurse(img, 0,            img.height/2,   img.height/2));
-        points.addAll(findVerticeRecurse(img, img.height/2, img.height,     img.height/2));
+    private Vector<VertexPoint> getVertices(ByteBufferImage img) {
+        Vector<VertexPoint> points = new Vector<VertexPoint>();
+        points.addAll(findVerticesRecursive(img, 0,            img.height/2,   img.height/2));
+        points.addAll(findVerticesRecursive(img, img.height/2, img.height,     img.height/2));
         
         return points;
     }
     
-    private ArrayList<Point> swapPoints(ArrayList<Point> points) {
+    private Vector<VertexPoint> swapPoints(Vector<VertexPoint> points) {
         for (int i = 0; i < points.size(); i++) {
-            Point p = points.get(i);
+            VertexPoint p = points.get(i);
             int tmp = p.x;
             p.x = p.y;
             p.y = tmp;
@@ -283,17 +282,39 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         return points;
     }
     
-    public ByteBufferImage detectVertices(ByteBufferImage img) {
-        ArrayList<Point> points = new ArrayList<Point>();
+    public VertexPoint[] detectAllVertices(ByteBufferImage img) {
+        Vector<VertexPoint> result = new Vector<VertexPoint>();
         
-        points.addAll(getVertices(img));
-        points.addAll(swapPoints(getVertices(swapIJ(img))));
+        result.addAll(getVertices(img));
+        result.addAll(swapPoints(getVertices(swapIJ(img))));
         
-        for (int i = 0; i < points.size(); i++) {
-            Point p = points.get(i);
-           // img.drawBox(p.x, p.y, 5, (byte)0xFF); 
+        return result.toArray(new VertexPoint[0]);
+    }
+    
+    public VertexPoint[] detectCornerVertices(ByteBufferImage img) {
+        Vector<VertexPoint> result = new Vector<VertexPoint>();
+        
+        VertexPoint all[] = detectAllVertices(img);
+        for (int i = 0; i < all.length; i++) {
+            VertexPoint p = all[i];
+            if (p.end)
+                result.add(p);
         }
         
+        return result.toArray(new VertexPoint[0]);
+    }
+    
+    public ByteBufferImage drawPoints(ByteBufferImage img, VertexPoint points[]) {
+        for (int i = 0; i < points.length; i++) {
+            VertexPoint p = points[i];
+            if (!p.end)
+                img.drawBox(p.x, p.y, 5, (byte)0xFF);
+        }
+        for (int i = 0; i < points.length; i++) {
+            VertexPoint p = points[i];
+            if (p.end)
+                img.drawBox(p.x, p.y, 5, (byte)0x7F);
+        }
         return img;
     }
     
