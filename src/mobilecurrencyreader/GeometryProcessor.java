@@ -15,7 +15,7 @@ package mobilecurrencyreader;
  */
 public interface GeometryProcessor {
     public ByteBufferImage translateImage(ByteBufferImage orig, int tx, int ty);
-    public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation);
+   public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,double i0,double j0);
     public ByteBufferImage cropImage(ByteBufferImage orig, int tx, int ty, int newWidth, int newHeight);
 
     public ByteBufferImage scaleImage(ByteBufferImage orig, double sx, double sy);
