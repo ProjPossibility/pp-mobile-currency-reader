@@ -23,4 +23,10 @@ class VertexPoint {
         this.y = y;
         this.end = end;
     }
- }
+    public double distanceTo(VertexPoint b) {
+        return distance(this, b);
+    }
+    public static double distance(VertexPoint a, VertexPoint b) {
+        return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
+    }
+}

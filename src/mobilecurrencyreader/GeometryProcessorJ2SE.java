@@ -154,11 +154,49 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         
         return out;
     }
+    
+    class tmp {
+        public int k, l;
+        public double dist;
+        public tmp(int k, int l, double dist) {
+            this.k = k;
+            this.l = l;
+            this.dist = dist;
+        }
+    }
 
-    public ByteBufferImage extractImage(ByteBufferImage origt, VertexPoint[] verticeArray) {
+    public ByteBufferImage extractImage(ByteBufferImage img, VertexPoint[] points) {
+        double short_edge_dist = Double.MAX_VALUE,
+               long_edge_dist = Double.MIN_VALUE,
+               diagonal_edge_dist = Double.MIN_VALUE;
         
+        for (int k = 0; k < points.length; k++) {
+            for (int l = 0; l < k; l++) {
+                double dist = VertexPoint.distance(points[k], points[l]);
+                if (dist < short_edge_dist)
+                    short_edge_dist = dist;
+                if (dist > diagonal_edge_dist)
+                    diagonal_edge_dist = dist;
+            }
+        }
+        System.out.println("long="+ long_edge_dist + " short=" + short_edge_dist + " diagonal=" + diagonal_edge_dist);
         
-        return origt;
+        for (int k = 0; k < points.length; k++) {
+            for (int l = 0; l < k; l++) {
+                double dist = VertexPoint.distance(points[k], points[l]);
+                if (Math.abs(dist - short_edge_dist) < 10) {
+                    System.out.println("Short ("+k+","+l+") " + dist);
+                } else if (Math.abs(dist - diagonal_edge_dist) < 10) {
+                    System.out.println("Diagonal ("+k+","+l+") " + dist);
+                } else {
+                    System.out.println("Long ("+k+","+l+") " + dist);
+                    double rad = Math.acos(Math.abs(points[k].x-points[l].x)/dist);
+                    System.out.println("Degrees: " + (rad/Math.PI*180) + " " + (points[k].x<points[l].x?"(k<l)":"(k>l)"));
+                }
+            }
+        }
+        
+        return img;
     }
     
     public boolean isFeature(ByteBufferImage img, int iIn, int jIn) {
@@ -317,7 +355,7 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         for (int i = 0; i < points.length; i++) {
             VertexPoint p = points[i];
             if (p.end)
-                img.drawBox(p.x, p.y, 5, (byte)0x7F);
+                img.drawBox(p.x, p.y, 5, (byte)(0x3F*i));
         }
         return img;
     }
