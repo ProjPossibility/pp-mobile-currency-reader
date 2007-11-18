@@ -70,7 +70,7 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
             for (int i=iIn-1; i<=iIn+1; i++) {
                 for (int j=jIn-1; j<=jIn+1; j++) {
                     if (!(j == jIn && i == iIn) && i>=0 && j >=0 && i<img.height && j < img.width) {
-                        total += img.getPixelInt(j, i);
+                        total += img.getPixelInt(i, j);
                         num++;
                     }
                 }
@@ -171,5 +171,15 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
         for (int i = 0; i < buf.getSize(); i++)
             newImg.bytes[i] = (byte)buf.getElem(i);
         return newImg;
+    }
+    
+    public ByteBufferImage swapIJ(ByteBufferImage img) {
+        ByteBufferImage out = new ByteBufferImage(img.height, img.width);
+        for (int i=0; i<img.height; i++) {
+            for (int j=0; j<img.width; j++) {
+                out.setPixel(j, i, img.getPixel(i, j));
+            }
+        }
+        return out;
     }
 }

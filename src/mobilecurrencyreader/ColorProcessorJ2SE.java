@@ -108,7 +108,7 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         double sum = 0.0;
         for (int i = y0; i < y1; i++)
             for (int j = x0; j < x1; j++)
-                sum += Math.pow(image.getPixelDouble(j,i) - mean, 2);
+                sum += Math.pow(image.getPixelDouble(i,j) - mean, 2);
         return Math.sqrt(sum/((x1-x0)*(y1-y0)));
     }
     
@@ -116,7 +116,7 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         double sum = 0.0;
         for (int i = y0; i < y1; i++)
             for (int j = x0; j < x1; j++)
-                sum += image.getPixelDouble(j,i);
+                sum += image.getPixelDouble(i,j);
         return sum / ((x1-x0)*(y1-y0));
     }
     
@@ -145,6 +145,4 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         
         return original;
     }
-    
-
 }
