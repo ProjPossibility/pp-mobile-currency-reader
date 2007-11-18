@@ -84,66 +84,44 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
     public ByteBufferImage scaleImage(ByteBufferImage orig, double tx, double ty) {
         int scaleBuf[][] = new int[orig.height][orig.width];
         int TscaleBuf[][] = new int[orig.height][orig.width];
-        int i,j,k,l,count;
-        int startX,startY,lastX,lastY;
-   
-        for(i=0;i<orig.height;i++)
-        {
-            for(j=0;j<orig.width;j++)
-            {
-               scaleBuf[i][j]=500;
-            }
-        }
-        for(i=0;i<orig.height;i++)
-        {
-            for(j=0;j<orig.width;j++)
-            {
-                if(((int)(i*tx)<orig.height)&&((int)(j*ty)<orig.width))
-                    scaleBuf[(int)(i*tx)][(int)(j*ty)]=orig.getPixelInt(i,j);
-            }
-        }
-         int val;
+        int i,j,x,y,x0,y0,x1,y1;
+        double xReal,yReal,dx,dy,omdx,omdy,bilinear;
         
-        if((tx!=1)||(ty!=1))
-        {
-           for(i=0;i<orig.height;i++)
+        tx=1/tx;
+        ty=1/ty;
+  
+       for(i=0;i<orig.height;i++)
             {
                 for(j=0;j<orig.width;j++)
                 {
-                  if(scaleBuf[i][j]==500)
-                  {
-                    startX=(int)(i-3>0?i-3:0);
-		    startY=(int)(j-3>0?j-3:0);
-		    lastX=(int)(i+3<orig.height?i+3:orig.height);
-		    lastY=(int)(j+3<orig.width?j+3:orig.width);
-                    count=0;
-                     val=0;
-                     
-				for(k=startX;k<lastX;k++)
-				for(l=startY;l<lastY;l++)
-				{
-					if(scaleBuf[k][l]!=500)
-					{
-					val+=scaleBuf[k][l];
-					
-						count++;
-					}
-				}
-				if(count!=0)
-				TscaleBuf[i][j]=val/count;
-				
-                  }
-                  else
-                  {
-                      TscaleBuf[i][j]= scaleBuf[i][j];
-                  }
+                   scaleBuf[i][j]=orig.getPixelInt(i,j);
                 }
             }
+ 
+        for(x=0;x<orig.height;x++)
+            {
+                for(y=0;y<orig.width;y++)
+                {
+
+                xReal=x*tx;  // 0 <= xReal <= N-1
+                yReal=y*ty;  // 0 <= yReal <= M-1
+
+                     x0 = (int)(xReal); y0 = (int)(yReal);
+                    if((x0<orig.height)&&(y0<orig.width))
+                    {
+                        dx = xReal-x0;
+                        dy = yReal-y0; 
+                        omdx = 1-dx; omdy = 1-dy;
+                        y1=(y0+1 >=orig.width)?orig.width-1:y0+1;
+                        x1=(x0+1 >=orig.height)?orig.height-1:x0+1;
+
+                        bilinear = omdx*omdy*scaleBuf[x0][y0] +omdx*dy*scaleBuf[x0][y1] +dx*omdy*scaleBuf[x1][y0] + dx*dy*scaleBuf[x1][y1];
+                        TscaleBuf[x][y]=(int)bilinear;
+
+                    }
+                }
         }
-        
-        
-        
-        
+
         
          for(i=0;i<orig.height;i++)
         {
@@ -153,6 +131,12 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
                 orig.setPixel(i,j,(byte)TscaleBuf[i][j]);
             }
          }
+         
+         
+         
+         
+         
+         
             
             
         
