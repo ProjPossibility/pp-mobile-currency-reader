@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Vector;
 import javax.imageio.ImageIO;
+import java.awt.image.*;
+import java.awt.Graphics2D;
 
 /**
  *
@@ -133,9 +135,22 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
         }
         return new ByteBufferImage(newBytes,orig.width,orig.height);
     }
+        public ByteBufferImage resizeImage(ByteBufferImage orig, int height,int width){
+            
+            ByteBufferImage newBuff= new ByteBufferImage(height,width);
+            for(int i =0;i<height;i++)
+                for(int j=0;j<width;j++)
+                {
+                newBuff.setPixel(i,j,orig.getPixel(i,j));
+                    
+                }
+            return newBuff;
+        }
+    
     public ByteBufferImage scaleImage(ByteBufferImage orig, double tx, double ty) {
         int scaleBuf[][] = new int[orig.height][orig.width];
         int TscaleBuf[][] = new int[orig.height][orig.width];
+        
         int i,j,x,y,x0,y0,x1,y1;
         double xReal,yReal,dx,dy,omdx,omdy,bilinear;
         
@@ -149,7 +164,8 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
                    scaleBuf[i][j]=orig.getPixelInt(i,j);
                 }
             }
- 
+        
+       
         for(x=0;x<orig.height;x++)
             {
                 for(y=0;y<orig.width;y++)
@@ -173,8 +189,7 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
                     }
                 }
         }
-
-        
+             
          for(i=0;i<orig.height;i++)
         {
                     
@@ -183,24 +198,25 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
                 orig.setPixel(i,j,(byte)TscaleBuf[i][j]);
             }
          }
-         
-         
-         
-         
-         
-         
-            
-            
         
-        return orig;
+            
+       return orig;
     }
+    
     
     public ByteBufferImage cropImage(ByteBufferImage orig, int tx, int ty, int newWidth, int newHeight) {
         ByteBufferImage out = new ByteBufferImage(newWidth, newHeight);
         int dest=0;
         for (int i=ty; i<ty+newHeight; i++) {
             for (int j=tx; j<tx+newWidth; j++, dest++) {
+                if((i>=orig.height)||(j>=orig.width))
+                {
+                 out.bytes[dest]=0;   
+                }
+                else
+                {
                 out.bytes[dest] = orig.getPixel(i, j);
+                }
             }
         }
         
@@ -495,6 +511,8 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
         return new BufferedImage(colorModel, raster, isAlphaPremultiplied, null);
     }
     
+    
+    
     // converts a buffered image to a byte array
     public ByteBufferImage bufferedToByte(BufferedImage orig) {
      byte[] newBytes = new byte[orig.getWidth()*orig.getHeight()];
@@ -509,6 +527,51 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
               }
      return new ByteBufferImage(newBytes,orig.getWidth(),orig.getHeight());
     }
+    
+    public int[] bufferedToInt(BufferedImage img) {
+        DataBuffer buf = img.getData().getDataBuffer();
+        int [] newImg = new int[buf.getSize()];
+        for (int i = 0; i < buf.getSize(); i++)
+            newImg[i] = buf.getElem(i);
+        return newImg;
+    }
+    
+    public  BufferedImage getBufferedImage(int[] pic,int WIDTH,int HEIGHT) {
+	BufferedImage bi = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_BGR);
+	for (int i = 0; i < WIDTH; ++i) {
+		for (int j = 0; j < HEIGHT; ++j) {
+			bi.setRGB(i, j, pic[j * HEIGHT + i]);
+		}
+	}
+	return bi;
+}
+
+    
+    public BufferedImage createThumbnail(BufferedImage image, int thumbHeight, int thumbWidth)
+{
+   int sourceWidth = image.getWidth();
+   int sourceHeight = image.getHeight();
+ 
+   BufferedImage thumb = new BufferedImage(thumbWidth, thumbHeight, BufferedImage.TYPE_INT_BGR);
+   Graphics2D g = thumb.createGraphics();
+ 
+   for (int y = 0; y < thumbHeight; y++)
+   {
+      for (int x = 0; x < thumbWidth; x++)
+      {
+        g.setClip(x, y, 1, 1);
+        int dx = x * sourceWidth / thumbWidth;
+        int dy = y * sourceHeight / thumbHeight;
+        g.drawImage(image, null,x,y);
+      }
+   }
+ 
+   BufferedImage immutableThumb = image;
+ 
+   return immutableThumb;
+}
+    
+    
     
     public ByteBufferImage swapIJ(ByteBufferImage img) {
         ByteBufferImage out = new ByteBufferImage(img.height, img.width);
