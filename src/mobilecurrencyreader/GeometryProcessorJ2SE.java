@@ -300,7 +300,7 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
         x1 = y1 = Integer.MIN_VALUE;
         for (int k = 0; k < points.length; k++) {
             points[k] = rotatePoint(points[k], rotation_radians, origin_y, origin_x);
-            bbi.drawBox(points[k].x, points[k].y, 10, (byte)0x7f);
+            //bbi.drawBox(points[k].x, points[k].y, 10, (byte)0x7f);
             if (points[k].x < x0) x0 = points[k].x;
             if (points[k].x > x1) x1 = points[k].x;
             if (points[k].y < y0) y0 = points[k].y;
@@ -375,7 +375,7 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
     }
     
     private Vector findVerticesRecursive(ByteBufferImage img, int min_row, int max_row, int last_row) {
-        System.out.println("min_row=" + min_row + " max_row=" + max_row + " last_row=" + last_row);
+        //System.out.println("min_row=" + min_row + " max_row=" + max_row + " last_row=" + last_row);
         if (Math.abs(max_row-min_row) <= 1) {
             Vector list = new Vector();
             

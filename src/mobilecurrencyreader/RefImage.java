@@ -15,11 +15,14 @@ package mobilecurrencyreader;
  */
     class RefImage {
         public String filename;
+        public String audio_filename;
         public int value;
         public ByteBufferImage bbi;
         public double difference;
-        public RefImage(String filename, int value) {
+        public RefImage(String filename, String audio_filename, int value) {
             this.filename = filename;
             this.value = value;
+            this.audio_filename = audio_filename;
         }
     }
+    
