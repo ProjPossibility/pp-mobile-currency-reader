@@ -57,9 +57,10 @@ public class ColorProcessorJ2SE implements ColorProcessor {
         }
         for(i=0;i<orig.bytes.length;i++)
         {
-            sumOfSquares+= ((int)orig.bytes[i]-(int)compare.bytes[i])*((int)orig.bytes[i]-(int)compare.bytes[i]);
+            
+            sumOfSquares+= (orig.getPixelInt(i)-compare.getPixelInt(i))*(orig.getPixelInt(i)-compare.getPixelInt(i));
         }
-        rmsVal=sumOfSquares/orig.bytes.length;
+        rmsVal=((double)sumOfSquares)/((double)orig.bytes.length);
         rmsVal=Math.sqrt(rmsVal);
         return rmsVal;
        

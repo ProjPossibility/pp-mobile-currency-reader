@@ -325,6 +325,10 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
     }
     
     public boolean isFeature(ByteBufferImage img, int iIn, int jIn) {
+        if (jIn >= img.width || iIn >= img.height) {
+            System.out.println("It happened!");
+            return false;
+        }
         if (img.getPixelInt(iIn, jIn) < 128) {
             int num = 0;
             int total = 0;
@@ -515,17 +519,16 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,d
     
     // converts a buffered image to a byte array
     public ByteBufferImage bufferedToByte(BufferedImage orig) {
-     byte[] newBytes = new byte[orig.getWidth()*orig.getHeight()];
-       for(int i=0;i<orig.getHeight();i++)
-            for(int j=0;j<orig.getWidth();j++)
-               {
-                   int k1=orig.getRGB(j,i);
-                   double bb=(double)(0x00ff & k1);
-                   double gg=(double)((0x00ff)&(k1 >> 8));
-                   double rr=(double)((0x00ff)&((k1 >> 16)));
-                   newBytes[i*(orig.getWidth())+j]=(byte)((0.3*rr+0.59*gg+0.11*bb));
-              }
-     return new ByteBufferImage(newBytes,orig.getWidth(),orig.getHeight());
+        byte[] newBytes = new byte[orig.getWidth()*orig.getHeight()];
+        for(int i=0;i<orig.getHeight();i++)
+            for(int j=0;j<orig.getWidth();j++) {
+            int k1=orig.getRGB(j,i);
+            double bb=(double)(0x00ff & k1);
+            double gg=(double)((0x00ff)&(k1 >> 8));
+            double rr=(double)((0x00ff)&((k1 >> 16)));
+            newBytes[i*(orig.getWidth())+j]=(byte)((0.3*rr+0.59*gg+0.11*bb));
+            }
+        return new ByteBufferImage(newBytes,orig.getWidth(),orig.getHeight());
     }
     
     public int[] bufferedToInt(BufferedImage img) {
