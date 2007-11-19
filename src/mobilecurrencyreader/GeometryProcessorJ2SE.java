@@ -455,13 +455,4 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,d
         return out;
     }
 
-    private byte findMean(ByteBufferImage orig, int i, int j) {
-        int h=orig.height;
-        int w=orig.width;
-        double k=orig.bytes[i*w+j]+orig.bytes[(i+1)*w+j]+orig.bytes[(i-1)*w+j];
-        double r=orig.bytes[(i)*w+j-1]+orig.bytes[(i)*w+j+1]+orig.bytes[(i+1)*w+j+1];
-        double l=orig.bytes[(i-1)*w+j-1]+orig.bytes[(i+1)*w+j-1]+orig.bytes[(i-1)*w+j+1];
-        return (byte)((k+r+l)/9);
-    }
-
 }
