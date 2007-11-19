@@ -77,15 +77,20 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
 }
     
 
+    
+    
+    
 public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,double i0,double j0) {
         double angle = Math.toRadians(angleOfRotation);
         double sin = Math.sin(angle);
         double cos = Math.cos(angle);
-		byte[] source = orig.bytes;
-        byte[] dest = new byte[source.length];
+	byte[] source = orig.bytes;
+        byte[] newBytes = new byte[source.length];
+        int[] dest = new int[source.length];
         
         for (int i = 0; i < orig.height; ++i) {
             for (int j = 0; j < orig.width; ++j) {
+                dest[i*orig.width+j]=-1;
                 double transI = i - i0;
                 double transJ = j - j0;
                 double rotJ = transJ * cos - transI * sin;
@@ -97,8 +102,29 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,d
                 }
             }
         }
-		return new ByteBufferImage(dest,orig.height,orig.width);
+        
+        angle *= -1;
+        sin = Math.sin(angle);
+        cos = Math.cos(angle);
+        for (int i = 0; i < orig.height; ++i) {
+            for (int j = 0; j < orig.width; ++j) {
+                if(dest[i * orig.width + j] < 0){
+                    double transI = i - i0;
+                    double transJ = j - j0;
+                    double rotJ = transJ * cos - transI * sin;
+                    double rotI = transJ * sin + transI * cos;
+                    int finalI = (int)Math.round(rotI + i0);
+                    int finalJ = (int)Math.round(rotJ + j0);
+                    if (finalI >= 0 && finalI <orig.height && finalJ >=0 && finalJ < orig.width) {
+                        dest[i * orig.width + j] = orig.bytes[finalI * orig.width + finalJ];
+                    }
+                }
+                newBytes[i * orig.width + j] = (byte)dest[i * orig.width + j];
+            }
+        }
+        return new ByteBufferImage(newBytes,orig.width,orig.height);
     }
+
     public ByteBufferImage scaleImage(ByteBufferImage orig, double tx, double ty) {
         int scaleBuf[][] = new int[orig.height][orig.width];
         int TscaleBuf[][] = new int[orig.height][orig.width];
@@ -427,6 +453,15 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,d
             }
         }
         return out;
+    }
+
+    private byte findMean(ByteBufferImage orig, int i, int j) {
+        int h=orig.height;
+        int w=orig.width;
+        double k=orig.bytes[i*w+j]+orig.bytes[(i+1)*w+j]+orig.bytes[(i-1)*w+j];
+        double r=orig.bytes[(i)*w+j-1]+orig.bytes[(i)*w+j+1]+orig.bytes[(i+1)*w+j+1];
+        double l=orig.bytes[(i-1)*w+j-1]+orig.bytes[(i+1)*w+j-1]+orig.bytes[(i-1)*w+j+1];
+        return (byte)((k+r+l)/9);
     }
 
 }
