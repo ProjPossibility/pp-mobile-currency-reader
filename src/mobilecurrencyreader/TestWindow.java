@@ -1,6 +1,8 @@
 package mobilecurrencyreader;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Vector;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -60,23 +62,27 @@ public class TestWindow extends JFrame implements ActionListener {
     }
     
     public void actionPerformed(ActionEvent e) {
-        BufferedImage gray = convertToGrayScale(leftImage);
+        /*BufferedImage gray = convertToGrayScale(leftImage);
         
         GeometryProcessorJ2SE gp = new GeometryProcessorJ2SE();
         ColorProcessorJ2SE cp = new ColorProcessorJ2SE();
         
         ByteBufferImage bbi = gp.bufferedToByte(gray);
         
-        tmp = !tmp;
-        if (tmp) {
-            bbi = cp.expandDynamicRange(bbi);
-        }
+        bbi = cp.expandDynamicRange(bbi, bbi.width/4, bbi.height/4, 3*bbi.width/4, 3*bbi.height/4, 0, 128);
+            
+        VertexPoint vp[] = gp.detectCornerVertices(bbi);
+        gp.drawPoints(bbi, vp);
+        
+        bbi = gp.extractImage(bbi, vp);
+        
+        
         
         BufferedImage new_buf = gp.byteToBuffered(bbi);
         
         setRightImage(new_buf);
         
-        rightPanel.invalidate();
+        rightPanel.invalidate();*/
     }
     
 

@@ -119,6 +119,9 @@ public class ColorProcessorJ2SE implements ColorProcessor {
     public ByteBufferImage expandDynamicRange(ByteBufferImage original, int x0, int y0, int x1, int y1) {
         return expandDynamicRange(original, x0, y0, x1, y1, 0, 255);
     }
+    public ByteBufferImage expandDynamicRange(ByteBufferImage original, int m, int n) {
+        return expandDynamicRange(original, 0, 0, original.width-1, original.height-1, m, n);
+    }
     
     public ByteBufferImage expandDynamicRange(ByteBufferImage original, int x0, int y0, int x1, int y1, int m, int n) {
         double mean = calculateMean(original, x0, y0, x1, y1);

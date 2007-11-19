@@ -76,12 +76,21 @@ public class GeometryProcessorJ2SE implements GeometryProcessor {
      return new ByteBufferImage(newBytes,bytes.width,bytes.height);
 }
     
+public VertexPoint rotatePoint(VertexPoint orig, double angle, double i0, double j0) {
+    double sin = Math.sin(angle);
+    double cos = Math.cos(angle);
 
-    
-    
-    
-public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,double i0,double j0) {
-        double angle = Math.toRadians(angleOfRotation);
+    double transI = orig.y - i0;
+    double transJ = orig.x - j0;
+    double rotJ = transJ * cos - transI * sin;
+    double rotI = transJ * sin + transI * cos;
+    int finalI = (int)Math.round(rotI + i0);
+    int finalJ = (int)Math.round(rotJ + j0);
+
+    return new VertexPoint(finalJ, finalI, orig.end);
+}
+
+public ByteBufferImage rotateImage(ByteBufferImage orig, float angle,double i0,double j0) {
         double sin = Math.sin(angle);
         double cos = Math.cos(angle);
 	byte[] source = orig.bytes;
@@ -124,7 +133,6 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,d
         }
         return new ByteBufferImage(newBytes,orig.width,orig.height);
     }
-
     public ByteBufferImage scaleImage(ByteBufferImage orig, double tx, double ty) {
         int scaleBuf[][] = new int[orig.height][orig.width];
         int TscaleBuf[][] = new int[orig.height][orig.width];
@@ -198,18 +206,10 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,d
         
         return out;
     }
-    
-    class tmp {
-        public int k, l;
-        public double dist;
-        public tmp(int k, int l, double dist) {
-            this.k = k;
-            this.l = l;
-            this.dist = dist;
-        }
-    }
 
     public ByteBufferImage extractImage(ByteBufferImage img, VertexPoint[] points) {
+        
+        // figure out which line segments are the long ones:
         double short_edge_dist = Double.MAX_VALUE,
                long_edge_dist = Double.MIN_VALUE,
                diagonal_edge_dist = Double.MIN_VALUE;
@@ -223,24 +223,89 @@ public ByteBufferImage rotateImage(ByteBufferImage orig, float angleOfRotation,d
                     diagonal_edge_dist = dist;
             }
         }
-        System.out.println("long="+ long_edge_dist + " short=" + short_edge_dist + " diagonal=" + diagonal_edge_dist);
         
+        // for keeping track of angle / direction
+        int direction = 0;
+        double sum_rad = 0;
+        int num_lines = 0;
+        
+        // use the long ones 
         for (int k = 0; k < points.length; k++) {
             for (int l = 0; l < k; l++) {
                 double dist = VertexPoint.distance(points[k], points[l]);
                 if (Math.abs(dist - short_edge_dist) < 10) {
-                    System.out.println("Short ("+k+","+l+") " + dist);
+                    //System.out.println("Short ("+k+","+l+") " + dist);
                 } else if (Math.abs(dist - diagonal_edge_dist) < 10) {
-                    System.out.println("Diagonal ("+k+","+l+") " + dist);
+                    //System.out.println("Diagonal ("+k+","+l+") " + dist);
                 } else {
                     System.out.println("Long ("+k+","+l+") " + dist);
+                    
                     double rad = Math.acos(Math.abs(points[k].x-points[l].x)/dist);
-                    System.out.println("Degrees: " + (rad/Math.PI*180) + " " + (points[k].x<points[l].x?"(k<l)":"(k>l)"));
+                    sum_rad += rad;
+                    num_lines++;
+                    
+                    //System.out.println("Degrees: " + (rad/Math.PI*180));
+                    
+                    VertexPoint upper = (points[k].y < points[l].y) ? points[k] : points[l];
+                    VertexPoint lower = (points[k].y < points[l].y) ? points[l] : points[k];
+                    int new_direction = (upper.x > lower.x) ? 1 : -1;
+                    if (direction != 0 && direction != new_direction) {
+                        System.out.println("WARNING: direction of rotation not same for both lines, using last");
+                        sum_rad = rad;
+                        num_lines = 1;
+                    }
+                    direction = new_direction;
+                    
+                    //System.out.println("Direction: " + direction);
                 }
             }
         }
+        // calculate average angle
+        float rotation_radians = (float)(sum_rad / num_lines) * direction;
         
-        return img;
+        System.out.println("Final rotation: " + rotation_radians + " rad (" + rotation_radians/Math.PI*180);
+        
+        // find extents to calculate center of bill
+        int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, y0 = Integer.MAX_VALUE, y1 = Integer.MIN_VALUE;
+        for (int k = 0; k < points.length; k++) {
+            if (points[k].x < x0) x0 = points[k].x;
+            if (points[k].x > x1) x1 = points[k].x;
+            if (points[k].y < y0) y0 = points[k].y;
+            if (points[k].y > y1) y1 = points[k].y;
+        }
+        double origin_x = x0 + (((double)x1)-((double)x0))/2.0;
+        double origin_y = y0 + (((double)y1)-((double)y0))/2.0;
+        
+        // rotate image about center by the given degrees
+        ByteBufferImage bbi = rotateImage(img, rotation_radians, origin_y, origin_x);
+        
+        // rotate vertices about center by the given degrees, and find extents
+        x0 = y0 = Integer.MAX_VALUE;
+        x1 = y1 = Integer.MIN_VALUE;
+        for (int k = 0; k < points.length; k++) {
+            points[k] = rotatePoint(points[k], rotation_radians, origin_y, origin_x);
+            bbi.drawBox(points[k].x, points[k].y, 10, (byte)0x7f);
+            if (points[k].x < x0) x0 = points[k].x;
+            if (points[k].x > x1) x1 = points[k].x;
+            if (points[k].y < y0) y0 = points[k].y;
+            if (points[k].y > y1) y1 = points[k].y;
+        }
+        int w = x1 - x0;
+        int h = y1 - y0;
+        bbi = cropImage(bbi, x0, y0, w, h);
+        /*
+        // calculate scaling factor
+        double sx = ((double)bbi.width)  / ((double)(x1-x0));
+        double sy = ((double)bbi.height) / ((double)(y1-y0));
+        
+        // translate
+        bbi = translateImage(bbi,-y0,-x0);
+        */
+        // scale
+//        bbi = scaleImage(bbi,0.5,0.5);
+//        bbi = cropImage(bbi, x0, y0, x1/2, y1/2);
+        
+        return bbi;
     }
     
     public boolean isFeature(ByteBufferImage img, int iIn, int jIn) {
