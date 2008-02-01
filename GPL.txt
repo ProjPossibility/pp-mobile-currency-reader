@@ -1,4 +1,3 @@
-/*
     This file is part of Mobile Currency Reader.
 
     Mobile Currency Reader is free software: you can redistribute it and/or modify
@@ -18,17 +17,3 @@
     collaboration for the disabled.
     
     For more information, visit http://projectpossibility.org
-*/
-
-
-
-
-package mobilecurrencyreader;
-
-/**
- *
- * @author binarygame
- */
-public interface ConvolutionProcessor {
-    public ByteBufferImage sobelKernelDerivative(ByteBufferImage img);
-}
