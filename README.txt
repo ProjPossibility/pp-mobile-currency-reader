@@ -1,4 +1,4 @@
-ight now this is an experimental project as we investigate supporting development of our projects
+Right now this is an experimental project as we investigate supporting development of our projects
 
 Overview
 The concept behind the mobile currency reader is a cellphone based application that will take a picture of a bill with a camera phone and detect its value automatically. During the SS12 competition a prototype was developed that does basic recognition for specific test cases using the Java Mobile Edition cellphone emulator.
